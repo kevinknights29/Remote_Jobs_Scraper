@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 
 async function scrapeLinkedInJobs(url) {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
     await page.goto(url);
 
@@ -11,8 +11,7 @@ async function scrapeLinkedInJobs(url) {
 
     let jobListings = [];
 
-    $('.base-card').each((index, element) => {
-        if (index < 10) {
+    $('.base-card').each((_, element) => {
             const id = $(element).attr('data-entity-urn').split(':')[3];
             const link = $(element).find('.base-card__full-link').attr('href').trim();
             const title = $(element).find('.base-search-card__title').text().trim();
@@ -20,13 +19,13 @@ async function scrapeLinkedInJobs(url) {
             const date = $(element).find('.job-search-card__listdate--new').text().trim();
 
             jobListings.push({ id, link, title, location, date });
-        }
     });
 
-    console.log(JSON.stringify(jobListings, null, 2));
+    console.log(`Got ${jobListings.length} job listings`);
+    // console.log(JSON.stringify(jobListings, null, 2));
 
     await browser.close();
 }
 
-const url = 'https://www.linkedin.com/jobs/jobs-in-worldwide?keywords=&location=Worldwide&f_TPR=&f_WT=2&position=1&pageNum=0';
+const url = 'https://www.linkedin.com/jobs/jobs-in-worldwide?keywords=&location=Worldwide&f_TPR=&f_WT=2';
 scrapeLinkedInJobs(url);
