@@ -11,5 +11,9 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "puppeteer": "^21.7.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-google": "^0.14.0"
   }
 }
