@@ -1,32 +1,42 @@
-const puppeteer = require('puppeteer');
+const axios = require('axios');
 const cheerio = require('cheerio');
 
 /**
- * Scrapes job listings from LinkedIn using the provided URL.
- *
- * @param {string} url - The URL of the LinkedIn job search page.
- * @return {Promise<void>} - A promise that resolves when the scraping
- *  is completed.
+ * Fetches jobs data from the specified URL.
+ * @param {string} url - The URL to fetch the jobs data from.
+ * @return {Promise<any>} - A promise that resolves to the fetched jobs data
+ *  or null if an error occurs.
  */
-async function scrapeLinkedInJobs(url) {
-  const browser = await puppeteer.launch({headless: 'new'});
-  const page = await browser.newPage();
-  await page.goto(url, {waitUntil: 'networkidle2'});
+async function fetchJobs(url) {
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('[ERROR] Error fetching data:', error);
+    return null;
+  }
+}
 
+/**
+ * Scrapes LinkedIn job listings from a specific URL and retrieves job data.
+ * @return {Promise<void>} A promise that resolves when the scraping is
+ *  complete.
+ */
+async function scrapeLinkedInJobs() {
+  const baseUrl = 'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/jobs-in-worldwide';
+  const queryParams = 'keywords=&location=Worldwide&f_TPR=&f_WT=2&' +
+    'position=1&pageNum=0';
+  let start = 0;
+  const limit = 100;
   const jobListings = [];
-  let previousHeight;
 
-  while (jobListings.length < 100) { // Example: Scrape 100 listings
-    previousHeight = await page.evaluate('document.body.scrollHeight');
-    await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
-    await page.waitForFunction(
-        `document.body.scrollHeight > ${previousHeight}`);
-    await new Promise(
-        (resolve) => setTimeout(resolve, 2000)); // Wait for scroll
+  while (jobListings.length < limit) {
+    const url = `${baseUrl}?${queryParams}&start=${start}`;
+    const data = await fetchJobs(url);
 
-    const content = await page.content();
-    const $ = cheerio.load(content);
+    if (!data) break;
 
+    const $ = cheerio.load(data);
     $('.base-card').each((_, element) => {
       const id = $(element).attr('data-entity-urn').split(':')[3];
       const link = $(element).find('.base-card__full-link').attr('href').trim();
@@ -42,28 +52,13 @@ async function scrapeLinkedInJobs(url) {
       }
     });
 
-    // Handle 'See more jobs' button
-    try {
-      // Check for 'See more jobs' button and click if present
-      const moreJobsButton = await page.$(
-          '.infinite-scroller__show-more-button');
-      if (moreJobsButton) {
-        await page.evaluate(
-            (button) => button.scrollIntoView(), moreJobsButton);
-        await moreJobsButton.click();
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-      }
-    } catch (error) {
-      console.error('[ERROR] Error handling more jobs button:', error);
-      break;
-    }
+    start += 25; // LinkedIn loads jobs 25 at a time
+    if ($('.base-card').length < 25) break;
+    // Break if fewer than 25 jobs were loaded, indicating the end of listings
   }
 
   console.log(`Got ${jobListings.length} job listings`);
-  // console.log(JSON.stringify(jobListings, null, 2));
-
-  await browser.close();
+  // You can also output the listings here, e.g. console.log(jobListings);
 }
 
-const url = 'https://www.linkedin.com/jobs/jobs-in-worldwide?keywords=&location=Worldwide&f_TPR=&f_WT=2';
-scrapeLinkedInJobs(url);
+scrapeLinkedInJobs();
