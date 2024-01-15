@@ -51,17 +51,24 @@ async function scrapeLinkedInJobs() {
 
     const $ = cheerio.load(data);
     $('.base-card').each((_, element) => {
-      const id = $(element).attr('data-entity-urn').split(':')[3];
-      const link = $(element).find('.base-card__full-link').attr('href').trim();
-      const title = $(element).find('.base-search-card__title').text().trim();
-      const location = $(element).find(
-          '.job-search-card__location').text().trim();
-      const date = $(element).find(
-          '.job-search-card__listdate--new').text().trim();
+      const id = $(element).attr('data-entity-urn')?.split(':')[3];
+      const linkElement = $(element).find('.base-card__full-link');
+      const link = linkElement.attr('href') ?
+        linkElement.attr('href').trim() : '';
+      const titleElement = $(element).find('.base-search-card__title');
+      const title = titleElement.length ? titleElement.text().trim() : '';
+      const locationElement = $(element).find('.job-search-card__location');
+      const location = locationElement.length ?
+        locationElement.text().trim() : '';
+      const dateElement = $(element).find('.job-search-card__listdate--new');
+      const date = dateElement.length ? dateElement.text().trim() : '';
 
-      const jobData = {id, link, title, location, date};
-      if (!jobListings.some((job) => job.id === id)) {
-        jobListings.push(jobData);
+      // Ensure that the essential data (like id or title) is present
+      if (id && title) {
+        const jobData = {id, link, title, location, date};
+        if (!jobListings.some((job) => job.id === id)) {
+          jobListings.push(jobData);
+        }
       }
     });
 
