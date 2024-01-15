@@ -2,7 +2,7 @@ require('dotenv').config();
 const {createClient} = require('@supabase/supabase-js');
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseKey = process.env.SUPABASE_API_KEY;
 
 /**
  * The Supabase client for interacting with the Supabase API.
