@@ -30,10 +30,11 @@ async function fetchJobs(url) {
   }
 }
 
+
 /**
- * Scrapes LinkedIn job listings from a specific URL and retrieves job data.
- * @return {Promise<void>} A promise that resolves when the scraping is
- *  complete.
+ * Scrapes LinkedIn job listings.
+ *
+ * @return {Promise<Array<Object>>} An array of job listings.
  */
 async function scrapeLinkedInJobs() {
   const baseUrl = 'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/jobs-in-worldwide';
@@ -81,6 +82,7 @@ async function scrapeLinkedInJobs() {
   }
 
   console.log(`Got ${jobListings.length} job listings`);
+  return jobListings;
 }
 
 module.exports = {
