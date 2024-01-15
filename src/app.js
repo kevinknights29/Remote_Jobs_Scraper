@@ -15,7 +15,7 @@ async function main() {
     const jobData = {
       id: job.id,
       role: job.title,
-      company: '', // Extract or derive if possible
+      company: job.company,
       url: job.link,
       location: job.location,
       created_at: new Date().toISOString(),

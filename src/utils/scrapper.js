@@ -57,6 +57,9 @@ async function scrapeLinkedInJobs() {
         linkElement.attr('href').trim() : '';
       const titleElement = $(element).find('.base-search-card__title');
       const title = titleElement.length ? titleElement.text().trim() : '';
+      const companyElement = $(element).find('.base-search-card__subtitle');
+      const company = companyElement.length ?
+        companyElement.text().trim() : '';
       const locationElement = $(element).find('.job-search-card__location');
       const location = locationElement.length ?
         locationElement.text().trim() : '';
@@ -65,7 +68,7 @@ async function scrapeLinkedInJobs() {
 
       // Ensure that the essential data (like id or title) is present
       if (id && title) {
-        const jobData = {id, link, title, location, date};
+        const jobData = {id, link, title, company, location, date};
         if (!jobListings.some((job) => job.id === id)) {
           jobListings.push(jobData);
         }
@@ -78,7 +81,6 @@ async function scrapeLinkedInJobs() {
   }
 
   console.log(`Got ${jobListings.length} job listings`);
-  // You can also output the listings here, e.g. console.log(jobListings);
 }
 
 scrapeLinkedInJobs();
