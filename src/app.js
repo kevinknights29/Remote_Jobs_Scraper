@@ -1,7 +1,7 @@
 require('dotenv').config();
 const axios = require('axios');
 const cheerio = require('cheerio');
-const {HttpsProxyAgent} = require('https-proxy-agent');
+const {HttpProxyAgent} = require('http-proxy-agent');
 
 /**
  * Fetches jobs data from the specified URL.
@@ -14,17 +14,15 @@ async function fetchJobs(url) {
   const password = process.env.PROXY_PASSWORD;
   const host = process.env.PROXY_HOST;
   const port = process.env.PROXY_PORT;
-  const sessionId = (1000000 * Math.random()) | 0;
 
-  const proxyOptions = {
-    host: host,
-    port: port,
-    auth: `${username}-session-${sessionId}:${password}`,
-  };
-  const agent = new HttpsProxyAgent(proxyOptions);
+  const proxyUrl = `http://${username}:${password}@${host}:${port}`;
+  const agent = new HttpProxyAgent(proxyUrl);
 
   try {
-    const response = await axios.get(url, {httpsAgent: agent});
+    const response = await axios.get(
+        url,
+        {httpAgent: agent, httpsAgent: agent},
+    );
     return response.data;
   } catch (error) {
     console.error('[ERROR] Error fetching data:', error);
