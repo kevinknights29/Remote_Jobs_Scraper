@@ -8,7 +8,7 @@ const {insertJobListing} = require('./utils/database');
  *  listings are inserted.
  */
 async function main() {
-  const jobListings = await scrapeLinkedInJobs('your-scraping-url');
+  const jobListings = await scrapeLinkedInJobs();
 
   for (const job of jobListings) {
     // Transform the job data to match your database schema
