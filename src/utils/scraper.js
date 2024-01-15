@@ -83,4 +83,6 @@ async function scrapeLinkedInJobs() {
   console.log(`Got ${jobListings.length} job listings`);
 }
 
-scrapeLinkedInJobs();
+module.exports = {
+  scrapeLinkedInJobs,
+};
