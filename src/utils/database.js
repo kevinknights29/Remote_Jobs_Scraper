@@ -10,8 +10,8 @@ async function insertJobListing(job) {
   // Check if the job already exists
   const {data: existingJobs, error: fetchError} = await supabase
       .from('jobs')
-      .select('id')
-      .eq('id', job.id);
+      .select('source_listing_id')
+      .eq('source_listing_id', job.source_listing_id);
 
   if (fetchError) {
     console.error('Error fetching existing job:', fetchError);
@@ -31,7 +31,7 @@ async function insertJobListing(job) {
 
     console.log('Job inserted:', data);
   } else {
-    console.log('Job already exists:', job.id);
+    console.log('Job already exists:', job.source_listing_id);
   }
 }
 
