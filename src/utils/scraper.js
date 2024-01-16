@@ -66,10 +66,11 @@ async function scrapeLinkedInJobs() {
         locationElement.text().trim() : '';
       const dateElement = $(element).find('.job-search-card__listdate--new');
       const date = dateElement.length ? dateElement.text().trim() : '';
+      const source = 'LinkedIn';
 
       // Ensure that the essential data (like id or title) is present
       if (id && title) {
-        const jobData = {id, link, title, company, location, date};
+        const jobData = {id, link, title, company, location, date, source};
         if (!jobListings.some((job) => job.id === id)) {
           jobListings.push(jobData);
         }
