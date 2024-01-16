@@ -1,3 +1,4 @@
+require('dotenv').config();
 const {scrapeLinkedInJobs} = require('./utils/scraper');
 const {insertJobListing} = require('./utils/database');
 
@@ -13,7 +14,7 @@ async function main() {
   for (const job of jobListings) {
     // Transform the job data to match your database schema
     const jobData = {
-      id: job.id,
+      user_id: process.env.ADMIN_USER_ID,
       role: job.title,
       company: job.company,
       url: job.link,
@@ -21,6 +22,8 @@ async function main() {
       created_at: new Date().toISOString(),
       last_update_at: new Date().toISOString(),
       tags: [], // Populate if you have this data
+      source: job.source,
+      source_listing_id: job.id,
     };
 
     await insertJobListing(jobData);
